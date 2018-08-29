@@ -4,8 +4,6 @@ __AesB64 aesB64;
 
 uint64_t chipid;
 char chip_ID [40];
-uint16_t current;
-uint16_t voltge;
 char encryption_key[] = "bse64aes128esp32";
 
 
@@ -14,8 +12,12 @@ void setup() {
   Serial.begin(115200);
   chipid = ESP.getEfuseMac();
   sprintf(chip_ID, "ESP32 Chipid= %i%i", (uint16_t)(chipid >> 32), (uint32_t)(chipid));
-  String encrypted_str = aesB64.encry_charry(chip_ID,encryption_key);
-  Serial.println(encrypted_str);}
+  String encrypted_str = aesB64.encry_arr2str(chip_ID,encryption_key);
+  char* encrypted_arr = aesB64.encry_arr2arr(chip_ID,encryption_key);
+  Serial.println(encrypted_str);
+  Serial.println(encrypted_arr);
+  
+  }
 
 void loop() {
 

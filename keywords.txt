@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map ESP32AESB64
+# Syntax Coloring Map ESP32AESB64     #
 #######################################
 
 #######################################
@@ -11,7 +11,7 @@ __AesB64	KEYWORD1	__AesB64
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-encry_charry    	KEYWORD2
+encry_arr2str    	    KEYWORD2
 add_padding             KEYWORD2
 #######################################
 # Constants (LITERAL1)

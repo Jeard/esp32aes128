@@ -3,15 +3,11 @@
 
 class __AesB64{
     private:
-        uint8_t _len_charry = 0;
-        uint8_t _k = 0;
-        uint8_t _modulo_16 =0;
-        uint8_t _len_padding=0;
 
     public:
-        String  encry_charry(char *charry, char * key);
-        void    add_padding(char *rsltn_ary,uint8_t padding_len, uint16_t org_array_len);
+        char*   encry_arr2arr(char *charry, char * key);
+        String  encry_arr2str(char *charry, char * key);
+        void    add_padding(char *rsltn_ary,size_t padding_len, size_t org_array_len);
 };
-
 
 #endif

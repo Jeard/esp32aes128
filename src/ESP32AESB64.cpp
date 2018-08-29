@@ -1,39 +1,77 @@
 #include <Arduino.h>
 #include <mbedtls/aes.h>
+extern "C" {
+#include <libb64/cdecode.h>
+#include <libb64/cencode.h>
+}
 #include "ESP32AESB64.h"
-#include "base64.h"
 
-
-
-base64 b_64;
 mbedtls_aes_context aes;
 
-String __AesB64::encry_charry(char *charry, char * key) {
-  _len_charry = strlen(charry);
-   _k = _len_charry / 16;
-   _modulo_16 = _len_charry % 16;
-   _len_padding = 0;
+/**
+ * convert input data to AES128 encrypted base64
+ * @param charry char *
+ * @param key char *
+ * @return char *
+ */
+
+char* __AesB64::encry_arr2arr(char *charry, char * key) {
+  size_t _len_charry = strlen(charry);
+  size_t _k = _len_charry / 16;
+  uint8_t _modulo_16 = _len_charry % 16;
+  size_t  _len_padding = 0;
   if (_modulo_16 != 0) {
     _k= _k+ 1;
-    _len_padding = 16 - _modulo_16;}
-  char* array_2_encr=(char*) malloc((_k* 16));
+    _len_padding = 16 - _modulo_16;
+    }
+  size_t length=(_k* 16);
+  char* array_2_encr=(char*) malloc(length);
   memcpy (array_2_encr, charry, _len_charry );
   if (_modulo_16 != 0) {
-    add_padding(array_2_encr, _len_padding, _len_charry );}
-   uint8_t* encrypted_array=(uint8_t*) malloc((_k* 16) + 1); 
+    add_padding(array_2_encr, _len_padding, _len_charry );
+    }
+   uint8_t* encrypted_array=(uint8_t*) malloc(length+1); 
     for (int i = 0; i < _k ;i++) {
     char* block =(char*)malloc(16);
     memcpy(block, array_2_encr + ((16 * i)), 16);
-    //char *input = block;
     uint8_t* output=(uint8_t*)malloc(16);
     mbedtls_aes_init( &aes );
     mbedtls_aes_setkey_enc( &aes, (const unsigned char*) key, strlen(key) * 8 );
     mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_ENCRYPT, (const unsigned char*)block, output);
     mbedtls_aes_free( &aes );
-    memcpy(encrypted_array + (16 * i), output, 16);}
-    return (b_64.encode(encrypted_array, (_k* 16)));}
+    memcpy(encrypted_array + (16 * i), output, 16);
+    }
+    size_t _bufferSize=((length*1.6f)+1);
+    char * buffer = (char *) malloc(_bufferSize);
+    base64_encodestate _state;
+    base64_init_encodestate(&_state);
+    int len = base64_encode_block((const char *) &encrypted_array[0], length, &buffer[0], &_state);
+    len = base64_encode_blockend((buffer + len), &_state);
+    return buffer;
+}
 
-void __AesB64::add_padding(char *rsltn_ary,uint8_t padding_len, uint16_t org_array_len) {
+/**
+ * convert input data to AES128 encrypted base64
+ * @param charry char *
+ * @param key char *
+ * @return String
+ */
+String __AesB64::encry_arr2str(char *charry, char * key) {
+  char* encoded_arr=__AesB64::encry_arr2arr(charry, key);
+  String base64 = String(encoded_arr);
+  free(encoded_arr);
+  return base64;
+  }
+
+/**
+ * Add padding to fill a given array
+ * @param rsltn_ary char *
+ * @param padding_len size_t
+ * @param array_len size_t
+ * @return void
+ */
+void __AesB64::add_padding(char *rsltn_ary,size_t padding_len, size_t array_len) {
   for (uint8_t i = 0; i < padding_len; i++) {
-    uint16_t val = (org_array_len + i);
-    rsltn_ary[val] = '\0';}}
+    uint8_t val = (array_len + i);
+    rsltn_ary[val] = '\0';}
+    }
