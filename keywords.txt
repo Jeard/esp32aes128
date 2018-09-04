@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-__AesB64	KEYWORD1	__AesB64
+__AesB64	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
