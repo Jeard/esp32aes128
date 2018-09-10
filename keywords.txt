@@ -11,9 +11,9 @@ __AesB64	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-encry_arr2arr    	    KEYWORD2
-encry_arr2str    	    KEYWORD2
-add_padding             KEYWORD2
+encry_arr2arr	KEYWORD2
+encry_arr2str	KEYWORD2
+add_padding	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
