@@ -61,11 +61,3 @@ String __AesB64::encry_arr2str(char *charry, char * key) {
   free(encoded_arr);
   return base64;
   }
-
-/**
- * Add padding to fill a given array
- * @param rsltn_ary char *
- * @param padding_len size_t
- * @param array_len size_t
- * @return void
- */
