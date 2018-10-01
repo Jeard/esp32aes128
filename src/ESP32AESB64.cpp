@@ -18,20 +18,19 @@ mbedtls_aes_context aes;
 char* __AesB64::encry_arr2arr(char *charry, char * key) {
   size_t _len_charry = strlen(charry);
   size_t _k = _len_charry / 16;
-  uint8_t _modulo_16 = _len_charry % 16;
-  size_t  _len_padding = 0;
+  size_t _modulo_16 = _len_charry % 16;
   if (_modulo_16 != 0) {
     _k= _k+ 1;
-    _len_padding = 16 - _modulo_16;
     }
   size_t length=(_k* 16);
   char* array_2_encr=(char*) malloc(length);
+  memset(array_2_encr, 0x00, length);
   memcpy (array_2_encr, charry, _len_charry );
   if (_modulo_16 != 0) {
-    add_padding(array_2_encr, _len_padding, _len_charry );
+    array_2_encr[(_len_charry+1)]=0x80;
     }
-   uint8_t* encrypted_array=(uint8_t*) malloc(length+1); 
-    for (int i = 0; i < _k ;i++) {
+  uint8_t* encrypted_array=(uint8_t*) malloc(length+1); 
+  for (int i = 0; i < _k ;i++) {
     char* block =(char*)malloc(16);
     memcpy(block, array_2_encr + ((16 * i)), 16);
     uint8_t* output=(uint8_t*)malloc(16);
@@ -41,13 +40,13 @@ char* __AesB64::encry_arr2arr(char *charry, char * key) {
     mbedtls_aes_free( &aes );
     memcpy(encrypted_array + (16 * i), output, 16);
     }
-    size_t _bufferSize=((length*1.6f)+1);
-    char * buffer = (char *) malloc(_bufferSize);
-    base64_encodestate _state;
-    base64_init_encodestate(&_state);
-    int len = base64_encode_block((const char *) &encrypted_array[0], length, &buffer[0], &_state);
-    len = base64_encode_blockend((buffer + len), &_state);
-    return buffer;
+  size_t _bufferSize=((length*1.6f)+1);
+  char * buffer = (char *) malloc(_bufferSize);
+  base64_encodestate _state;
+  base64_init_encodestate(&_state);
+  int len = base64_encode_block((const char *) &encrypted_array[0], length, &buffer[0], &_state);
+  len = base64_encode_blockend((buffer + len), &_state);
+  return buffer;
 }
 
 /**
@@ -70,8 +69,3 @@ String __AesB64::encry_arr2str(char *charry, char * key) {
  * @param array_len size_t
  * @return void
  */
-void __AesB64::add_padding(char *rsltn_ary,size_t padding_len, size_t array_len) {
-  for (uint8_t i = 0; i < padding_len; i++) {
-    uint8_t val = (array_len + i);
-    rsltn_ary[val] = '\0';}
-    }

@@ -7,7 +7,6 @@ class __AesB64{
     public:
         char*   encry_arr2arr(char *charry, char * key);
         String  encry_arr2str(char *charry, char * key);
-        void    add_padding(char *rsltn_ary,size_t padding_len, size_t org_array_len);
 };
 
 #endif
