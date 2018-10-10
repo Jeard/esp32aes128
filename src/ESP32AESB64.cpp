@@ -1,8 +1,7 @@
 #include <Arduino.h>
 #include <mbedtls/aes.h>
-extern "C" {
-#include <libb64/cdecode.h>
-#include <libb64/cencode.h>
+extern "C"{
+#include "cencode.h"
 }
 #include "ESP32AESB64.h"
 
@@ -29,21 +28,22 @@ char* __AesB64::encry_arr2arr(char *charry, char * key) {
   if (_modulo_16 != 0) {
     array_2_encr[(_len_charry+1)]=0x80;
     }
-  uint8_t* encrypted_array=(uint8_t*) malloc(length+1); 
+  uint8_t* encrypted_array=(uint8_t*) malloc(length+1);
+  char* block =(char*)malloc(16);
+  uint8_t* output=(uint8_t*)malloc(16); 
+  mbedtls_aes_init( &aes );
+  mbedtls_aes_setkey_enc( &aes, (const unsigned char*) key, strlen(key) * 8 );
   for (int i = 0; i < _k ;i++) {
-    char* block =(char*)malloc(16);
     memcpy(block, array_2_encr + ((16 * i)), 16);
-    uint8_t* output=(uint8_t*)malloc(16);
-    mbedtls_aes_init( &aes );
-    mbedtls_aes_setkey_enc( &aes, (const unsigned char*) key, strlen(key) * 8 );
-    mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_ENCRYPT, (const unsigned char*)block, output);
-    mbedtls_aes_free( &aes );
+    if(block!=NULL){
+    mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_ENCRYPT, (const unsigned char*)block, output);}
     memcpy(encrypted_array + (16 * i), output, 16);
     }
+  mbedtls_aes_free( &aes );
   size_t _bufferSize=((length*1.6f)+1);
   char * buffer = (char *) malloc(_bufferSize);
   base64_encodestate _state;
-  base64_init_encodestate(&_state);
+  base64_init_encodestate_nonewlines(&_state);
   int len = base64_encode_block((const char *) &encrypted_array[0], length, &buffer[0], &_state);
   len = base64_encode_blockend((buffer + len), &_state);
   return buffer;
